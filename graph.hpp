@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+using namespace std;
 /**
  * Class that represents a graph that can be weighted and/or directed if
  * desired.
@@ -46,20 +47,20 @@ public:
      * although it still checks for the four conditions mentioned above that
      * could result in the throwing of an exception.
      */
-    Graph(const std::string& filename);
+    Graph(const string& filename);
     /**
      * This constructor constructs the graph from the edge list given.
      * This constructor assumes the graph is unweighted.
      */
     Graph(unsigned numVertices,
-          const std::vector<std::pair<unsigned, unsigned>>& edges,
+          const vector<pair<unsigned, unsigned>>& edges,
           bool isDirected);
     /**
      * This constructor is the same as the one immediately above this one,
      * except that this constructor assumes that the graph is weighted.
      */
     Graph(unsigned numVertices,
-          const std::vector<std::tuple<unsigned, unsigned, int>>& edges,
+          const vector<tuple<unsigned, unsigned, int>>& edges,
           bool isDirected);
 
     /******************************************************
@@ -83,7 +84,7 @@ public:
      * otherwise, each int is the weight.
      * 0 indicates a nonexistent edge.
      */
-    std::vector<std::vector<int>> getAdjacencyMatrix() const;
+    vector<vector<int>> getAdjacencyMatrix() const;
     /**
      * Returns adjacency list represented by a 2D vector in which the vector at
      * index i contains the neighbor entries of vertex i.
@@ -91,7 +92,7 @@ public:
      * and the int gives the weight of the edge to that neighbor.
      * If the graph is unweighted, then each int is 1.
      */
-    std::vector<std::vector<std::pair<unsigned, int>>> getAdjacencyList() const;
+    vector<vector<pair<unsigned, int>>> getAdjacencyList() const;
 
     /******************************************************
      * Graph traversals.
@@ -99,8 +100,8 @@ public:
      * Returns a BFS/DFS ordering of all vertices reachable from the start node.
      * Throws exception if @start is invalid, i.e. too high.
      *****************************************************/
-    std::vector<unsigned> getBFSOrdering(unsigned start) const;
-    std::vector<unsigned> getDFSOrdering(unsigned start) const;
+    vector<unsigned> getBFSOrdering(unsigned start) const;
+    vector<unsigned> getDFSOrdering(unsigned start) const;
 
     /******************************************************
      * Other graph algorithms.
@@ -114,11 +115,19 @@ public:
      * hops"), we will say that a node can reach itself, i.e. the main diagonal
      * of the matrix should be all true.
      */
-    std::vector<std::vector<bool>> getTransitiveClosure() const;
+    vector<vector<bool>> getTransitiveClosure() const;
 
 private:
     // TODO: Your private methods and member variables go here.
+    bool weighted;
+    bool directed;
 
+    string format;
+
+    unsigned numVertices;
+    unsigned numEdges;
+
+    vector<string> inputGraph;
 };
 
 #endif  // GRAPH_HPP
