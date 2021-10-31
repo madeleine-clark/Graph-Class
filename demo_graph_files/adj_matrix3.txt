@@ -1,0 +1,8 @@
+Weighted
+Undirected
+AdjMatrix
+4
+0 18 0 2
+  0 14 0
+    0 5
+      0
