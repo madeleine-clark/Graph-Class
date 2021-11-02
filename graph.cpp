@@ -8,18 +8,73 @@ using namespace std;
 
 Graph::Graph(const string& filename) {
 
-    ifstream ifs{filename};
+  ifstream infile;
+  infile.open(filename); // Do this the preferred way after passing test cases
 
-    getline(ifs, weighted);
-    getline(ifs, directed);
-    getline(ifs, format);
-    getline(if, numVertices);
+  // Add code to convert weighted, directed, and format into boolean values
+  infile >> weighted >> directed >> format >> numVertices;
 
-    string currLine;
-    while (getline(ifs, currLine)) {
-      inputGraph.push_back(currLine);
+  if (format == "ListEdges" && weighted == "Unweighted") {
+
+    int vert1, vert2;
+    graphMatrix.resize(numVertices, vector<int>(numVertices));
+
+    while (infile >> vert1 >> vert2) {
+      graphMatrix[vert1][vert2] = 1;
+      if (directed == "Undirected") {
+        graphMatrix[vertt2][vert1] = 1;
+      }
     }
+  }
+  else if (format == "ListEdges" && weighted == "Weighted") {
+
+    int vert1, vert2, weight;
+    graphMatrix.resize(numVertices, vector<int>(numVertices));
+
+    while (infile >> vert1 >> vert2 >> weight) {
+      graphMatrix[vert1][vert2] = weight;
+      if (directed == "Undirected") {
+        graphMatrix[vertt2][vert1] = weight;
+      }
+    }
+  }
+  else if (format == "AdjMatrix" && weighted == "Unweighted") {
+
+    string rowString;
+    char newline;
+    vector<string> tempMatrix;
+    int i, j;
+
+    graphMatrix.resize(numVertices, vector<int>(numVertices));
+
+    getline(infile, newline) // ignore newline leftover from infile >>
+
+    while (getline(infile, rowString)) {
+      tempMatrix.push_back(rowString);
+    }
+
+    for (i = 0; i < numVertices; i++) {
+
+      rowString = tempMatrix[i];
+
+      for (j = 0; j < rowString.size(); j++) {
+        if (rowString[j] = 'T') {
+          rowString[j] = 1;
+        }
+        else {
+          rowString[j] = 0;
+        }
+        graphMatrix[i][j] = rowString[j];
+      }
+    }
+  }
+  else if (format == "AdjMatrix" && weighted == "Weighted") {
+  }
+  else if (format == "AdjList" && weighted == "Weighted") {
+  }
+  else
 }
+
 
 Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected){
 

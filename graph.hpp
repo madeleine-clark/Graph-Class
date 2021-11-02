@@ -119,15 +119,15 @@ public:
 
 private:
     // TODO: Your private methods and member variables go here.
-    bool weighted;
-    bool directed;
-
+    string weighted;
+    string directed;
     string format;
 
     unsigned numVertices;
     unsigned numEdges;
 
-    vector<string> inputGraph;
+    vector<vector<int>> graphMatrix;
+
 };
 
 #endif  // GRAPH_HPP
