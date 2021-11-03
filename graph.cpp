@@ -3,6 +3,7 @@
 #include <tuple>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include "graph.hpp"
 using namespace std;
 
@@ -128,40 +129,35 @@ Graph::Graph(const string& filename) {
   }
   else {
 
-        string rowString;
-        string newline;
-        vector<string> tempMatrix;
-
         graphMatrix.resize(numVert, vector<int>(numVert));
 
+        string newline;
         getline(infile, newline); // ignore newline leftover from infile >>
 
-        // NEED TO USE STRING STREAM
+        istringstream inSS;
+        string rowString;
 
-        while (getline(infile, rowString)) {
-          // cout << rowString << endl; ==> tempMatrix was constructed correctly
-          tempMatrix.push_back(rowString);
-        }
+        unsigned neighbor;
+        int weight;
 
-        int neighbor;
+        for (unsigned currVert = 0; currVert < numVert; currVert++) {
 
-        for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
-          //cout << numVert;
-          rowString = tempMatrix[i];
-          //cout << i << ": " << rowString << endl;
-          cout << rowString.size() << endl;
+          getline(infile, rowString);
 
-          for (size_t j = 0; j < rowString.size(); j++) {
-            neighbor = rowString.at(j);
-            graphMatrix[i][neighbor] = 1;
+          inSS.clear();
+          inSS.str(rowString);
+
+          while (inSS >> neighbor >> weight){
+            // cout << "Edge from " << currVert << " to " << neighbor << " with weight " << weight << endl;
+            graphMatrix[currVert][neighbor] = weight;
+            // cout << numEdges << endl;
             numEdges++;
             if(!(directed)) {
-              graphMatrix[neighbor][i] = 1;
+              graphMatrix[neighbor][currVert] = weight;
             }
           }
         }
   }
-
   makeAdjacencyList();
 }
 
@@ -222,6 +218,7 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
 }
 
 void Graph::makeAdjacencyList() {
+  cout << "I'm being made!" << endl;
   graphList.resize(numVert);
   pair<unsigned, int> currNeighbor;
 

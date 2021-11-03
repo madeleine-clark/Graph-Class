@@ -134,7 +134,7 @@ private:
     string format;
 
     unsigned numVert;
-    unsigned numEdges;
+    unsigned numEdges = 0;
 
     vector<vector<int>> graphMatrix;
     vector<vector<pair<unsigned, int>>> graphList;
