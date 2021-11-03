@@ -4,6 +4,8 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <stack>
+#include <queue>
 #include "graph.hpp"
 using namespace std;
 
@@ -158,7 +160,9 @@ Graph::Graph(const string& filename) {
           }
         }
   }
+
   makeAdjacencyList();
+  makeAllBFSOrderings();
 }
 
 Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
@@ -186,6 +190,7 @@ Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges
   }
 
   makeAdjacencyList();
+  makeAllBFSOrderings();
 
 }
 
@@ -215,22 +220,59 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
   }
 
   makeAdjacencyList();
+  makeAllBFSOrderings();
 }
 
 void Graph::makeAdjacencyList() {
-  cout << "I'm being made!" << endl;
-  graphList.resize(numVert);
-  pair<unsigned, int> currNeighbor;
 
-  for (size_t currRow; currRow < numVert; currRow++) {
-    for (size_t currCol; currCol < numVert; currCol++) {
+  graphList.resize(numVert);
+
+  for (size_t currRow = 0; currRow < numVert; currRow++) {
+
+    for (size_t currCol = 0; currCol < numVert; currCol++) {
       if (graphMatrix[currRow][currCol] != 0) {
-        currNeighbor.first = currCol;
-        currNeighbor.second = graphMatrix[currRow][currCol];
-        graphList[currRow].push_back(currNeighbor);
+        graphList[currRow].push_back(make_pair(currCol, graphMatrix[currRow][currCol]));
+      }
+      }
+    }
+}
+
+void Graph::makeAllBFSOrderings() { // FINISH
+
+  for (size_t startVert = 0; startVert < numVert; startVert++) {
+
+    vector<bool> discovered(numVert, false);
+    discovered[startVert] = true;
+
+    vector<unsigned> bfs;
+    unsigned currVert;
+
+    queue<unsigned> q;
+    q.push(startVert);
+
+    while (!q.empty()) {
+
+      currVert = q.front();
+      q.pop();
+
+      bfs.push_back(currVert); // Process the current vertice
+
+      for (auto& neighbor : graphList[currVert]) {
+        if (!discovered[neighbor.first]) {
+          discovered[neighbor.first] = true;
+          q.push(neighbor.first);
         }
       }
     }
+  }
+}
+
+void Graph::makeAllDFSOrderings() { //FINISH
+
+}
+
+void Graph::makeTransitiveClosure() { //FINISH
+
 }
 
 bool Graph::isWeighted() const {
@@ -257,16 +299,16 @@ vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
   return graphList;
 }
 
-/*
-
-// DO GRAPH ALGOS AFTER EVEYTHING ELSE IS WORKING
-
-vector<unsigned> getBFSOrdering(unsigned start) const {
+// HOW CAN THIS BE CONST IF IT TAKES IN START?
+// PERFORM BFS FOR EVERY START NODE IN HELPER FUNCTION??
+vector<unsigned> Graph::getBFSOrdering(unsigned start) const {
+  return allBfs.at(start);
 }
 
-vector<unsigned> getDFSOrdering(unsigned start) const{
+vector<unsigned> Graph::getDFSOrdering(unsigned start) const {
+  return allDfs.at(start);
 }
 
-vector<vector<bool>> getTransitiveClosure() const{
+vector<vector<bool>> Graph::getTransitiveClosure() const{
+  return transitiveClosure;
 }
-*/
