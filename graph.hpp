@@ -119,14 +119,18 @@ public:
 
 private:
     // TODO: Your private methods and member variables go here.
-    string weighted;
-    string directed;
+    bool weighted;
+    bool directed;
+
     string format;
 
-    unsigned numVertices;
+    unsigned numVert;
     unsigned numEdges;
 
     vector<vector<int>> graphMatrix;
+    vector<vector<pair<unsigned, int>>> graphList;
+
+
 
 };
 

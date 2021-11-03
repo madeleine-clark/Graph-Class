@@ -11,76 +11,150 @@ Graph::Graph(const string& filename) {
   ifstream infile;
   infile.open(filename); // Do this the preferred way after passing test cases
 
-  // Add code to convert weighted, directed, and format into boolean values
-  infile >> weighted >> directed >> format >> numVertices;
+  string tempWeighted, tempDirected;
 
-  if (format == "ListEdges" && weighted == "Unweighted") {
+  infile >> tempWeighted >> tempDirected >> format >> numVert;
+
+  weighted = (tempWeighted == "Weighted") ? true : false;
+  directed = (tempDirected == "Directed") ? true : false;
+
+  if (format == "ListEdges" && !(weighted)) {
 
     int vert1, vert2;
-    graphMatrix.resize(numVertices, vector<int>(numVertices));
+    graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2) {
       graphMatrix[vert1][vert2] = 1;
-      if (directed == "Undirected") {
-        graphMatrix[vertt2][vert1] = 1;
+      numEdges++;
+      if (!(directed)) {
+        graphMatrix[vert2][vert1] = 1;
       }
     }
   }
-  else if (format == "ListEdges" && weighted == "Weighted") {
+  else if (format == "ListEdges" && weighted) {
 
     int vert1, vert2, weight;
-    graphMatrix.resize(numVertices, vector<int>(numVertices));
+    graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2 >> weight) {
       graphMatrix[vert1][vert2] = weight;
-      if (directed == "Undirected") {
-        graphMatrix[vertt2][vert1] = weight;
+      numEdges++;
+      if (!(directed)) {
+        graphMatrix[vert2][vert1] = weight;
       }
     }
   }
-  else if (format == "AdjMatrix" && weighted == "Unweighted") {
+  else if (format == "AdjMatrix" && !(weighted)) {
 
     string rowString;
     char newline;
     vector<string> tempMatrix;
-    int i, j;
 
-    graphMatrix.resize(numVertices, vector<int>(numVertices));
+    graphMatrix.resize(numVert, vector<int>(numVert));
 
-    getline(infile, newline) // ignore newline leftover from infile >>
+    getline(infile, newline); // ignore newline leftover from infile >>
 
     while (getline(infile, rowString)) {
       tempMatrix.push_back(rowString);
     }
 
-    for (i = 0; i < numVertices; i++) {
-
+    for (int i = 0; i < numVert; i++) {
       rowString = tempMatrix[i];
-
-      for (j = 0; j < rowString.size(); j++) {
-        if (rowString[j] = 'T') {
-          rowString[j] = 1;
+      for (int j = 0; j < rowString.size(); j++) {
+        graphMatrix[i][j] = (rowString[j] == 'T') ? 1 : 0;
+        numEdges++;
+        if(!(directed)) {
+          graphMatrix[j][i] = (rowString[j] == 'T') ? 1 : 0;
         }
-        else {
-          rowString[j] = 0;
-        }
-        graphMatrix[i][j] = rowString[j];
       }
     }
   }
-  else if (format == "AdjMatrix" && weighted == "Weighted") {
+  else if (format == "AdjMatrix" && weighted) {
+
+    string rowString;
+    char newline;
+    vector<string> temoMatrix;
+
+    graphMatrix.resize(numVert, vector<int>(numVert));
+
+    getline(infile, newline); //ignore newline leftover from infile >>
+
+    while (getline(infile, rowString)) {
+      tempMatrix.push_back(rowString);
+    }
+
+    for (int i = 0; i < numVert; i++) {
+      rowString = tempMatrix[i];
+      for (int j = 0; j < rowString.size(); j++) {
+        graphMatrix[i][j] = rowString[j];
+        numEdges++;
+        if(!(directed)) {
+          graphMatrix[j][i] = rowString[j];
+        }
+      }
+    }
+
+
   }
-  else if (format == "AdjList" && weighted == "Weighted") {
+  else if (format == "AdjList" && !(weighted)) {
   }
-  else
+  else {
+
+  }
 }
 
+Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
 
-Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected){
+  directed = isDirected;
+  numVert = numVertices;
+  weighted = false;
+
+  graphMatrix.resize(numVert, vector<int>(numVert));
+
+  unsigned vert1, vert2;
+
+  for (int i = 0; i < edges.size(); i++) {
+
+    vert1 = edges[i].first;
+    vert2 = edges[i].second;
+
+    graphMatrix[vert1][vert2] = 1;
+
+    numEdges++;
+
+    if (!directed) {
+      graphMatrix[vert2][vert1] = 1;
+    }
+  }
 
 }
 
 Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& edges, bool isDirected){
+
+  directed = isDirected;
+  numVert = numVertices;
+  weighted = true;
+
+  graphMatrix.resize(numVert, vector<int>(numVert));
+
+  unsigned vert1, vert2;
+  int weight;
+
+  for (int i = 0; i < edges.size(); i++) {
+
+    vert1 = get<0>(edges);
+    vert2 = get<1>(edges);
+    weight = get<2>(edges);
+
+    graphMatrix[vert1][vert2] = weight;
+
+    numEdges++;
+
+    if (!directed) {
+      graphMatrix[vert2][vert1] = weight;
+    }
+  }
+
 
 }
 
@@ -93,7 +167,7 @@ bool Graph::isDirected() const {
 }
 
 unsigned Graph::getNumVertices() const {
-  return numVertices;
+  return numVert;
 }
 
 unsigned Graph::getNumEdges() const {
@@ -101,10 +175,19 @@ unsigned Graph::getNumEdges() const {
 }
 
 vector<vector<int>> Graph::getAdjacencyMatrix() const {
+  return graphMatrix;
 }
 
 vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
+
 }
 
-vector<unsigned> getBFSOrdering(unsigned start) const;
-vector<unsigned> getDFSOrdering(unsigned start) const;
+// DO GRAPH ALGOS AFTER EVEYTHING ELSE IS WORKING
+vector<unsigned> getBFSOrdering(unsigned start) const {
+}
+
+vector<unsigned> getDFSOrdering(unsigned start) const{
+}
+
+vector<vector<bool>> getTransitiveClosure() const{
+}
