@@ -47,7 +47,7 @@ Graph::Graph(const string& filename) {
   else if (format == "AdjMatrix" && !(weighted)) {
 
     string rowString;
-    char newline;
+    string newline;
     vector<string> tempMatrix;
 
     graphMatrix.resize(numVert, vector<int>(numVert));
@@ -58,9 +58,9 @@ Graph::Graph(const string& filename) {
       tempMatrix.push_back(rowString);
     }
 
-    for (int i = 0; i < numVert; i++) {
+    for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
       rowString = tempMatrix[i];
-      for (int j = 0; j < rowString.size(); j++) {
+      for (size_t j = 0; j < rowString.size(); j++) {
         graphMatrix[i][j] = (rowString[j] == 'T') ? 1 : 0;
         numEdges++;
         if(!(directed)) {
@@ -72,8 +72,8 @@ Graph::Graph(const string& filename) {
   else if (format == "AdjMatrix" && weighted) {
 
     string rowString;
-    char newline;
-    vector<string> temoMatrix;
+    string newline;
+    vector<string> tempMatrix;
 
     graphMatrix.resize(numVert, vector<int>(numVert));
 
@@ -83,9 +83,9 @@ Graph::Graph(const string& filename) {
       tempMatrix.push_back(rowString);
     }
 
-    for (int i = 0; i < numVert; i++) {
+    for (size_t i = 0; i < numVert; i++) {
       rowString = tempMatrix[i];
-      for (int j = 0; j < rowString.size(); j++) {
+      for (size_t j = 0; j < rowString.size(); j++) {
         graphMatrix[i][j] = rowString[j];
         numEdges++;
         if(!(directed)) {
@@ -103,6 +103,7 @@ Graph::Graph(const string& filename) {
   }
 }
 
+/*
 Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
 
   directed = isDirected;
@@ -181,8 +182,10 @@ vector<vector<int>> Graph::getAdjacencyMatrix() const {
 vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
 
 }
+*/
 
 // DO GRAPH ALGOS AFTER EVEYTHING ELSE IS WORKING
+/*
 vector<unsigned> getBFSOrdering(unsigned start) const {
 }
 
@@ -191,3 +194,4 @@ vector<unsigned> getDFSOrdering(unsigned start) const{
 
 vector<vector<bool>> getTransitiveClosure() const{
 }
+*/
