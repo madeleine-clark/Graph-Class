@@ -18,6 +18,8 @@ Graph::Graph(const string& filename) {
   weighted = (tempWeighted == "Weighted") ? true : false;
   directed = (tempDirected == "Directed") ? true : false;
 
+  // cout << "So far so good" << endl; ==> good up until this point
+
   if (format == "ListEdges" && !(weighted)) {
 
     int vert1, vert2;
@@ -97,13 +99,72 @@ Graph::Graph(const string& filename) {
 
   }
   else if (format == "AdjList" && !(weighted)) {
+
+    string rowString;
+    string newline;
+    vector<string> tempMatrix;
+
+    graphMatrix.resize(numVert, vector<int>(numVert));
+
+    getline(infile, newline); // ignore newline leftover from infile >>
+
+    while (getline(infile, rowString)) {
+      tempMatrix.push_back(rowString);
+    }
+
+    int neighbor;
+
+    for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
+      rowString = tempMatrix[i];
+      for (size_t j = 0; j < rowString.size(); j++) {
+        neighbor = rowString.at(j);
+        graphMatrix[i][neighbor] = 1;
+        numEdges++;
+        if(!(directed)) {
+          graphMatrix[neighbor][i] = 1;
+        }
+      }
+    }
   }
   else {
 
+        string rowString;
+        string newline;
+        vector<string> tempMatrix;
+
+        graphMatrix.resize(numVert, vector<int>(numVert));
+
+        getline(infile, newline); // ignore newline leftover from infile >>
+
+        // NEED TO USE STRING STREAM
+
+        while (getline(infile, rowString)) {
+          // cout << rowString << endl; ==> tempMatrix was constructed correctly
+          tempMatrix.push_back(rowString);
+        }
+
+        int neighbor;
+
+        for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
+          //cout << numVert;
+          rowString = tempMatrix[i];
+          //cout << i << ": " << rowString << endl;
+          cout << rowString.size() << endl;
+
+          for (size_t j = 0; j < rowString.size(); j++) {
+            neighbor = rowString.at(j);
+            graphMatrix[i][neighbor] = 1;
+            numEdges++;
+            if(!(directed)) {
+              graphMatrix[neighbor][i] = 1;
+            }
+          }
+        }
   }
+
+  makeAdjacencyList();
 }
 
-/*
 Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
 
   directed = isDirected;
@@ -114,7 +175,7 @@ Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges
 
   unsigned vert1, vert2;
 
-  for (int i = 0; i < edges.size(); i++) {
+  for (size_t i = 0; i < edges.size(); i++) {
 
     vert1 = edges[i].first;
     vert2 = edges[i].second;
@@ -127,6 +188,8 @@ Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges
       graphMatrix[vert2][vert1] = 1;
     }
   }
+
+  makeAdjacencyList();
 
 }
 
@@ -141,14 +204,13 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
   unsigned vert1, vert2;
   int weight;
 
-  for (int i = 0; i < edges.size(); i++) {
+  for (size_t i = 0; i < edges.size(); i++) {
 
-    vert1 = get<0>(edges);
-    vert2 = get<1>(edges);
-    weight = get<2>(edges);
+    vert1 = get<0>(edges[i]);
+    vert2 = get<1>(edges[i]);
+    weight = get<2>(edges[i]);
 
     graphMatrix[vert1][vert2] = weight;
-
     numEdges++;
 
     if (!directed) {
@@ -156,7 +218,22 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
     }
   }
 
+  makeAdjacencyList();
+}
 
+void Graph::makeAdjacencyList() {
+  graphList.resize(numVert);
+  pair<unsigned, int> currNeighbor;
+
+  for (size_t currRow; currRow < numVert; currRow++) {
+    for (size_t currCol; currCol < numVert; currCol++) {
+      if (graphMatrix[currRow][currCol] != 0) {
+        currNeighbor.first = currCol;
+        currNeighbor.second = graphMatrix[currRow][currCol];
+        graphList[currRow].push_back(currNeighbor);
+        }
+      }
+    }
 }
 
 bool Graph::isWeighted() const {
@@ -180,12 +257,13 @@ vector<vector<int>> Graph::getAdjacencyMatrix() const {
 }
 
 vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
-
+  return graphList;
 }
-*/
+
+/*
 
 // DO GRAPH ALGOS AFTER EVEYTHING ELSE IS WORKING
-/*
+
 vector<unsigned> getBFSOrdering(unsigned start) const {
 }
 

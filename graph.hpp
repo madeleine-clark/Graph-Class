@@ -52,19 +52,18 @@ public:
      * This constructor constructs the graph from the edge list given.
      * This constructor assumes the graph is unweighted.
      */
-    /*Graph(unsigned numVertices,
+    Graph(unsigned numVertices,
           const vector<pair<unsigned, unsigned>>& edges,
           bool isDirected);
-    */
+
     /**
      * This constructor is the same as the one immediately above this one,
      * except that this constructor assumes that the graph is weighted.
      */
-     /*
+
     Graph(unsigned numVertices,
           const vector<tuple<unsigned, unsigned, int>>& edges,
           bool isDirected);
-    */
     /******************************************************
      * Delete copy constructor and copy assignment.
      * You don't need to do anything about these lines in graph.cpp.
@@ -76,29 +75,29 @@ public:
     /******************************************************
      * Accessor methods.
      *****************************************************/
-     /*
+
     bool isWeighted() const;
     bool isDirected() const;
     unsigned getNumVertices() const;
     unsigned getNumEdges() const;
-    */
+
     /**
      * Returns 2D vector of ints representing an adjacency matrix.
      * If graph is unweighted, then each int is either 1 or 0;
      * otherwise, each int is the weight.
      * 0 indicates a nonexistent edge.
      */
-     /*
+
     vector<vector<int>> getAdjacencyMatrix() const;
-    *//*
+    /*
      * Returns adjacency list represented by a 2D vector in which the vector at
      * index i contains the neighbor entries of vertex i.
      * For each neighbor entry, the unsigned gives the neighbor's ID,
      * and the int gives the weight of the edge to that neighbor.
      * If the graph is unweighted, then each int is 1.
-     *//*
+     */
     vector<vector<pair<unsigned, int>>> getAdjacencyList() const;
-    */
+
 
     /******************************************************
      * Graph traversals.
@@ -106,10 +105,10 @@ public:
      * Returns a BFS/DFS ordering of all vertices reachable from the start node.
      * Throws exception if @start is invalid, i.e. too high.
      *****************************************************/
-     /*
+
     vector<unsigned> getBFSOrdering(unsigned start) const;
     vector<unsigned> getDFSOrdering(unsigned start) const;
-    */
+
 
     /******************************************************
      * Other graph algorithms.
@@ -123,9 +122,9 @@ public:
      * hops"), we will say that a node can reach itself, i.e. the main diagonal
      * of the matrix should be all true.
      */
-     /*
+
     vector<vector<bool>> getTransitiveClosure() const;
-    */
+
 
 private:
     // TODO: Your private methods and member variables go here.
@@ -139,6 +138,8 @@ private:
 
     vector<vector<int>> graphMatrix;
     vector<vector<pair<unsigned, int>>> graphList;
+
+    void makeAdjacencyList();
 
 };
 
