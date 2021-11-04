@@ -57,33 +57,41 @@ Graph::Graph(const string& filename) {
   }
   else if (format == "AdjMatrix" && !(weighted)) {
 
-    string rowString;
-    string newline;
-    vector<string> tempMatrix;
-
     graphMatrix.resize(numVert, vector<int>(numVert));
 
+    string newline;
     getline(infile, newline); // ignore newline leftover from infile >>
 
-    while (getline(infile, rowString)) {
-      tempMatrix.push_back(rowString);
-    }
+    istringstream inSS;
+    string rowString;
 
-    for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
-      rowString = tempMatrix[i];
-      for (size_t j = 0; j < rowString.size(); j++) { //NEED TO CHECK FOR SELF LOOPS
-        if (rowString[j] == 'T') {
-          if (i == j) {
-            throw logic_error{"Invalid graph"};
-          }
-          else {
-            graphMatrix[i][j] = 1;
+    char truthValue;
+
+    for (unsigned currVert = 0; currVert < numVert; currVert++) {
+
+      getline(infile, rowString);
+
+      inSS.clear();
+      inSS.str(rowString);
+
+      // NEED DIFFERENT VERSION FOR UNDIRECTED! Only half of matrix provided
+      if (directed) {
+        for (unsigned neighbor = 0; neighbor < numVert; neighbor++) {
+          inSS >> truthValue;
+          if (truthValue == 'T') {
+            graphMatrix[currVert][neighbor] = 1;
             numEdges++;
-            if(!(directed)) {
-              graphMatrix[j][i] = 1;
-            }
           }
+         }
         }
+      else {
+        for (unsigned neighbor = currVert; neighbor < numVert; neighbor++) {
+        inSS >> truthValue;
+        if (truthValue == 'T') {
+          graphMatrix[currVert][neighbor] = 1;
+          numEdges++;
+        }
+       }
       }
     }
   }
@@ -120,31 +128,33 @@ Graph::Graph(const string& filename) {
   }
   else if (format == "AdjList" && !(weighted)) {
 
-    string rowString;
-    string newline;
-    vector<string> tempMatrix;
-
     graphMatrix.resize(numVert, vector<int>(numVert));
 
+    string newline;
     getline(infile, newline); // ignore newline leftover from infile >>
 
-    while (getline(infile, rowString)) {
-      tempMatrix.push_back(rowString);
-    }
+    istringstream inSS;
+    string rowString;
 
     unsigned neighbor;
 
-    for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
-      rowString = tempMatrix[i];
-      for (size_t j = 0; j < rowString.size(); j++) {
-        neighbor = rowString.at(j);
+    for (unsigned currVert = 0; currVert < numVert; currVert++) {
+
+      getline(infile, rowString);
+
+      inSS.clear();
+      inSS.str(rowString);
+
+      while (inSS >> neighbor){
+        // cout << "Edge from " << currVert << " to " << neighbor << " with weight " << weight << endl;
         if (neighbor >= numVert) {
           throw logic_error{"Invalid graph"};
         }
-        graphMatrix[i][neighbor] = 1;
+        graphMatrix[currVert][neighbor] = 1;
+        // cout << numEdges << endl;
         numEdges++;
         if(!(directed)) {
-          graphMatrix[neighbor][i] = 1;
+          graphMatrix[neighbor][currVert] = 1;
         }
       }
     }
@@ -187,7 +197,7 @@ Graph::Graph(const string& filename) {
   makeAdjacencyList();
 }
 
-Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
+Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected){
 
   directed = isDirected;
   numVert = numVertices;
