@@ -29,7 +29,7 @@ Graph::Graph(const string& filename) {
     graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2) {
-      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2)) {
+      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2) || (graphMatrix[vert1][vert2] != 0)) {
         throw logic_error{"Invalid graph"};
       }
       graphMatrix[vert1][vert2] = 1;
@@ -45,7 +45,7 @@ Graph::Graph(const string& filename) {
     graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2 >> weight) {
-      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2)) {
+      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2) || (graphMatrix[vert1][vert2] !=0)) {
         throw logic_error{"Invalid graph"};
       }
       graphMatrix[vert1][vert2] = weight;
@@ -55,7 +55,7 @@ Graph::Graph(const string& filename) {
       }
     }
   }
-  else if (format == "AdjMatrix" && !(weighted)) {
+  else if (format == "AdjMatrix" && !(weighted)) { // ADD EXCEPTIONS
 
     graphMatrix.resize(numVert, vector<int>(numVert));
 
@@ -89,6 +89,7 @@ Graph::Graph(const string& filename) {
         inSS >> truthValue;
         if (truthValue == 'T') {
           graphMatrix[currVert][neighbor] = 1;
+          graphMatrix[neighbor][currVert] = 1;
           numEdges++;
         }
        }
@@ -125,7 +126,7 @@ Graph::Graph(const string& filename) {
         }
       }
     }
-  }
+  } // ADD EXCEPTIONS
   else if (format == "AdjList" && !(weighted)) {
 
     graphMatrix.resize(numVert, vector<int>(numVert));
@@ -147,7 +148,7 @@ Graph::Graph(const string& filename) {
 
       while (inSS >> neighbor){
         // cout << "Edge from " << currVert << " to " << neighbor << " with weight " << weight << endl;
-        if (neighbor >= numVert) {
+        if ((neighbor >= numVert) || (currVert == neighbor) || (graphMatrix[currVert][neighbor] != 0)) {
           throw logic_error{"Invalid graph"};
         }
         graphMatrix[currVert][neighbor] = 1;
@@ -181,7 +182,7 @@ Graph::Graph(const string& filename) {
 
           while (inSS >> neighbor >> weight){
             // cout << "Edge from " << currVert << " to " << neighbor << " with weight " << weight << endl;
-            if (neighbor >= numVert) {
+            if ((neighbor >= numVert) || (currVert == neighbor) || (graphMatrix[currVert][neighbor] != 0)) {
               throw logic_error{"Invalid graph"};
             }
             graphMatrix[currVert][neighbor] = weight;
