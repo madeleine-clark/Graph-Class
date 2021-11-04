@@ -89,30 +89,34 @@ Graph::Graph(const string& filename) {
   }
   else if (format == "AdjMatrix" && weighted) {
 
-    string rowString;
-    string newline;
-    vector<string> tempMatrix;
-
     graphMatrix.resize(numVert, vector<int>(numVert));
 
-    getline(infile, newline); //ignore newline leftover from infile >>
+    string newline;
+    getline(infile, newline); // ignore newline leftover from infile >>
 
-    while (getline(infile, rowString)) {
-      tempMatrix.push_back(rowString);
-    }
+    istringstream inSS;
+    string rowString;
 
-    for (size_t i = 0; i < numVert; i++) {
-      rowString = tempMatrix[i];
-      for (size_t j = 0; j < rowString.size(); j++) {
-        graphMatrix[i][j] = rowString[j];
-        numEdges++;
+    int weight;
+
+    for (unsigned currVert = 0; currVert < numVert; currVert++) {
+
+      getline(infile, rowString);
+
+      inSS.clear();
+      inSS.str(rowString);
+
+      for (unsigned neighbor = 0; neighbor < numVert; neighbor++) {
+        inSS >> weight;
+        graphMatrix[currVert][neighbor] = weight;
+        if (weight != 0){
+          numEdges++;
+        }
         if(!(directed)) {
-          graphMatrix[j][i] = rowString[j];
+          graphMatrix[neighbor][currVert] = weight;
         }
       }
     }
-
-
   }
   else if (format == "AdjList" && !(weighted)) {
 
@@ -198,17 +202,18 @@ Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges
     vert1 = edges[i].first;
     vert2 = edges[i].second;
 
-    graphMatrix[vert1][vert2] = 1;
-
-    numEdges++;
-
-    if (!directed) {
-      graphMatrix[vert2][vert1] = 1;
+    if (((vert1 || vert2) >= numVert) || (vert1 == vert2) || (graphMatrix[vert1][vert2] == 1)) {
+      throw logic_error{"Invalid graph"};
+    }
+    else {
+      graphMatrix[vert1][vert2] = 1;
+      numEdges++;
+      if (!directed) {
+        graphMatrix[vert2][vert1] = 1;
+      }
     }
   }
-
   makeAdjacencyList();
-
 }
 
 Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& edges, bool isDirected){
@@ -228,14 +233,17 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
     vert2 = get<1>(edges[i]);
     weight = get<2>(edges[i]);
 
-    graphMatrix[vert1][vert2] = weight;
-    numEdges++;
-
-    if (!directed) {
-      graphMatrix[vert2][vert1] = weight;
+    if (((vert1 || vert2) >= numVert) || (vert1 == vert2) || (graphMatrix[vert1][vert2] == 1) || (weight == 0)) {
+      throw logic_error{"Invalid graph"};
+    }
+    else {
+      graphMatrix[vert1][vert2] = weight;
+      numEdges++;
+      if (!directed) {
+        graphMatrix[vert2][vert1] = weight;
+      }
     }
   }
-
   makeAdjacencyList();
 }
 
