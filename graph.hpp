@@ -140,12 +140,8 @@ private:
     vector<vector<pair<unsigned, int>>> graphList;
 
     void makeAdjacencyList();
-    void makeAllBFSOrderings();
-    void makeAllDFSOrderings();
     void makeTransitiveClosure();
 
-    vector<vector<unsigned>> allBfs;
-    vector<vector<unsigned>> allDfs;
     vector<vector<bool>> transitiveClosure;
 
 };

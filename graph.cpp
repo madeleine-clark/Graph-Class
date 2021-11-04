@@ -11,8 +11,10 @@ using namespace std;
 
 Graph::Graph(const string& filename) {
 
-  ifstream infile;
-  infile.open(filename); // Do this the preferred way after passing test cases
+  ifstream infile(filename);
+  if(!infile.is_open()) {
+    throw logic_error{"Failed to open file"};
+  }
 
   string tempWeighted, tempDirected;
 
@@ -21,14 +23,15 @@ Graph::Graph(const string& filename) {
   weighted = (tempWeighted == "Weighted") ? true : false;
   directed = (tempDirected == "Directed") ? true : false;
 
-  // cout << "So far so good" << endl; ==> good up until this point
-
   if (format == "ListEdges" && !(weighted)) {
 
-    int vert1, vert2;
+    unsigned vert1, vert2;
     graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2) {
+      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2)) {
+        throw logic_error{"Invalid graph"};
+      }
       graphMatrix[vert1][vert2] = 1;
       numEdges++;
       if (!(directed)) {
@@ -38,10 +41,13 @@ Graph::Graph(const string& filename) {
   }
   else if (format == "ListEdges" && weighted) {
 
-    int vert1, vert2, weight;
+    unsigned vert1, vert2, weight;
     graphMatrix.resize(numVert, vector<int>(numVert));
 
     while (infile >> vert1 >> vert2 >> weight) {
+      if ((vert1 >= numVert) || (vert2 >= numVert) || (vert1 == vert2)) {
+        throw logic_error{"Invalid graph"};
+      }
       graphMatrix[vert1][vert2] = weight;
       numEdges++;
       if (!(directed)) {
@@ -65,11 +71,18 @@ Graph::Graph(const string& filename) {
 
     for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
       rowString = tempMatrix[i];
-      for (size_t j = 0; j < rowString.size(); j++) {
-        graphMatrix[i][j] = (rowString[j] == 'T') ? 1 : 0;
-        numEdges++;
-        if(!(directed)) {
-          graphMatrix[j][i] = (rowString[j] == 'T') ? 1 : 0;
+      for (size_t j = 0; j < rowString.size(); j++) { //NEED TO CHECK FOR SELF LOOPS
+        if (rowString[j] == 'T') {
+          if (i == j) {
+            throw logic_error{"Invalid graph"};
+          }
+          else {
+            graphMatrix[i][j] = 1;
+            numEdges++;
+            if(!(directed)) {
+              graphMatrix[j][i] = 1;
+            }
+          }
         }
       }
     }
@@ -115,12 +128,15 @@ Graph::Graph(const string& filename) {
       tempMatrix.push_back(rowString);
     }
 
-    int neighbor;
+    unsigned neighbor;
 
     for (size_t i = 0; i < numVert; i++) { // WHY SIZE_T ??
       rowString = tempMatrix[i];
       for (size_t j = 0; j < rowString.size(); j++) {
         neighbor = rowString.at(j);
+        if (neighbor >= numVert) {
+          throw logic_error{"Invalid graph"};
+        }
         graphMatrix[i][neighbor] = 1;
         numEdges++;
         if(!(directed)) {
@@ -151,6 +167,9 @@ Graph::Graph(const string& filename) {
 
           while (inSS >> neighbor >> weight){
             // cout << "Edge from " << currVert << " to " << neighbor << " with weight " << weight << endl;
+            if (neighbor >= numVert) {
+              throw logic_error{"Invalid graph"};
+            }
             graphMatrix[currVert][neighbor] = weight;
             // cout << numEdges << endl;
             numEdges++;
@@ -162,7 +181,6 @@ Graph::Graph(const string& filename) {
   }
 
   makeAdjacencyList();
-  makeAllBFSOrderings();
 }
 
 Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges, bool isDirected) {
@@ -190,7 +208,6 @@ Graph::Graph(unsigned numVertices, const vector<pair<unsigned, unsigned>>& edges
   }
 
   makeAdjacencyList();
-  makeAllBFSOrderings();
 
 }
 
@@ -220,7 +237,6 @@ Graph::Graph(unsigned numVertices,const vector<tuple<unsigned, unsigned, int>>& 
   }
 
   makeAdjacencyList();
-  makeAllBFSOrderings();
 }
 
 void Graph::makeAdjacencyList() {
@@ -235,40 +251,6 @@ void Graph::makeAdjacencyList() {
       }
       }
     }
-}
-
-void Graph::makeAllBFSOrderings() { // FINISH
-
-  for (size_t startVert = 0; startVert < numVert; startVert++) {
-
-    vector<bool> discovered(numVert, false);
-    discovered[startVert] = true;
-
-    vector<unsigned> bfs;
-    unsigned currVert;
-
-    queue<unsigned> q;
-    q.push(startVert);
-
-    while (!q.empty()) {
-
-      currVert = q.front();
-      q.pop();
-
-      bfs.push_back(currVert); // Process the current vertice
-
-      for (auto& neighbor : graphList[currVert]) {
-        if (!discovered[neighbor.first]) {
-          discovered[neighbor.first] = true;
-          q.push(neighbor.first);
-        }
-      }
-    }
-  }
-}
-
-void Graph::makeAllDFSOrderings() { //FINISH
-
 }
 
 void Graph::makeTransitiveClosure() { //FINISH
@@ -302,11 +284,60 @@ vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
 // HOW CAN THIS BE CONST IF IT TAKES IN START?
 // PERFORM BFS FOR EVERY START NODE IN HELPER FUNCTION??
 vector<unsigned> Graph::getBFSOrdering(unsigned start) const {
-  return allBfs.at(start);
+
+  vector<bool> discovered(numVert, false);
+  discovered[start] = true;
+
+  vector<unsigned> bfs;
+  unsigned currVert;
+
+  queue<unsigned> q;
+  q.push(start);
+
+  while (!q.empty()) {
+
+    currVert = q.front();
+    q.pop();
+
+    bfs.push_back(currVert); // Process the current vertice
+
+    for (auto& neighbor : graphList[currVert]) {
+      if (!discovered[neighbor.first]) {
+        discovered[neighbor.first] = true;
+        q.push(neighbor.first);
+      }
+    }
+  }
+
+  return bfs;
 }
 
 vector<unsigned> Graph::getDFSOrdering(unsigned start) const {
-  return allDfs.at(start);
+
+  vector<bool> processed(numVert, false);
+
+  vector<unsigned> dfs;
+  unsigned currVert;
+
+  stack<unsigned> s;
+  s.push(start);
+
+  while (!s.empty()) {
+
+    currVert = s.top();
+    s.pop();
+
+    if (!processed[currVert]) {
+      dfs.push_back(currVert); // Process the current vertice
+      processed[currVert] = true;
+      for (auto& neighbor : graphList[currVert]) {
+        if(!processed[neighbor.first]) {
+          s.push(neighbor.first);
+        }
+      }
+    }
+  }
+  return dfs;
 }
 
 vector<vector<bool>> Graph::getTransitiveClosure() const{
