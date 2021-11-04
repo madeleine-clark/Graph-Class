@@ -300,9 +300,11 @@ vector<vector<pair<unsigned, int>>> Graph::getAdjacencyList() const {
   return graphList;
 }
 
-// HOW CAN THIS BE CONST IF IT TAKES IN START?
-// PERFORM BFS FOR EVERY START NODE IN HELPER FUNCTION??
 vector<unsigned> Graph::getBFSOrdering(unsigned start) const {
+
+  if (start >= numVert) {
+    throw logic_error{"Invalid start node"};
+  }
 
   vector<bool> discovered(numVert, false);
   discovered[start] = true;
@@ -333,6 +335,10 @@ vector<unsigned> Graph::getBFSOrdering(unsigned start) const {
 
 vector<unsigned> Graph::getDFSOrdering(unsigned start) const {
 
+  if (start >= numVert) {
+    throw logic_error{"Invalid start node"};
+  }
+
   vector<bool> processed(numVert, false);
 
   vector<unsigned> dfs;
@@ -359,6 +365,31 @@ vector<unsigned> Graph::getDFSOrdering(unsigned start) const {
   return dfs;
 }
 
+// USING FLOYD-WARSHALL'S ALGORITHM
+
 vector<vector<bool>> Graph::getTransitiveClosure() const{
-  return transitiveClosure;
+
+  vector<vector<bool>> transitiveClosureMatrix;
+
+  /*
+  for (unsigned midVert = 0; midVert < numVert; midVert++) {
+    for (unsigned startVert = 0; startVert < numVert; startVert++) {
+      for (unsigned endVert = 0; endVert < numVert; endVert++) {
+        if (graphMatrix[startVert][endVert] != 0) {
+          transitiveClosureMatrix[startVert][endVert] = true;
+        }
+        else if ((graphMatrix[startVert][midVert] != 0) && (graphMatrix[midVert][endVert] != 0)) {
+          transitiveClosureMatrix[startVert][endVert] = true;
+        }
+        else if (startVert == endVert) {
+          transitiveClosureMatrix[startVert][endVert] = true;
+        }
+        else {
+          continue;
+        }
+      }
+    }
+  }
+  */
+  return transitiveClosureMatrix;
 }
