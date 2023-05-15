@@ -127,7 +127,6 @@ public:
 
 
 private:
-    // TODO: Your private methods and member variables go here.
     bool weighted;
     bool directed;
 
